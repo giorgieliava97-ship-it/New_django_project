@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        .container { display: flex; gap: 40px; }
+        .sidebar { width: 250px; border-right: 1px solid #ccc; padding-right: 20px; }
+        .sale-badge { background-color: red; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+        ul { list-style: none; padding: 0; }
+        li { margin-bottom: 12px; }
+        a { text-decoration: none; color: #0066cc; }
+    </style>
+</head>
+<body>
+    <h1>Store</h1>
+    <a href="{% url 'store:discounted_products' %}" style="font-weight: bold; color: red;">🔥 Discounted Products</a>
+    <hr>
+
+    <div class="container">
+        <!-- კატეგორიების სექცია -->
+        <div class="sidebar">
+            <h3>Categories</h3>
+            <ul>
+                {% for category in categories %}
+                    <li>
+                        <a href="{% url 'store:category_products' category.pk %}">
+                            {{ category.name }} ({{ category.product_count }})
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- პროდუქტების ჩამონათვალი -->
+        <div class="content">
+            <h3>All Products</h3>
+            <ul>
+                {% for product in products %}
+                    <li>
+                        <a href="{% url 'store:product_detail' product.pk %}">
+                            <strong>{{ product.name }}</strong>
+                        </a>
+                        - {{ product.price }} ₾
+                        {% if product.has_discount %}
+                            <span class="sale-badge">SALE</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
