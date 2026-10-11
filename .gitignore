@@ -13,7 +13,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+env/Lib/
 lib64/
 parts/
 sast/
