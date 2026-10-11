@@ -26,9 +26,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Django local database (თუ არ გინდა რომ საბაზო მონაცემები აჰყვეს)
-db.sqlite3
-db.sqlite3-journal
+
 
 # IDEs / PyCharm
 .idea/
