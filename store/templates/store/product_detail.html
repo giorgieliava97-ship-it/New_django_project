@@ -1,24 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ product.name }}</title>
-    <style>
-        body { font-family: sans-serif; margin: 20px; }
-        .sale-badge { background-color: red; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 12px; }
-    </style>
-</head>
-<body>
-    <h1>{{ product.name }}</h1>
-    <p><strong>Price:</strong> {{ product.price }} ₾
-        {% if product.has_discount %}
-            <span class="sale-badge">SALE</span>
-        {% endif %}
-    </p>
-    <p><strong>Quantity:</strong> {{ product.quantity }}</p>
-    <p><strong>Category:</strong> {{ product.category.name }}</p>
-    <p><strong>Description:</strong> {{ product.description }}</p>
-    <hr>
-    <a href="{% url 'store:product_list' %}">Back to Products</a>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 bg-white border rounded p-5 shadow-sm">
+            <h1 class="mb-4">{{ product.name }}</h1>
+            <p class="fs-4"><strong>Price:</strong> {{ product.price }} ₾
+                {% if product.has_discount %}
+                    <span class="badge bg-danger">SALE</span>
+                {% endif %}
+            </p>
+            <p><strong>Quantity:</strong> {{ product.quantity }}</p>
+            <p><strong>Category:</strong> {{ product.category.name }}</p>
+            <p class="text-muted"><strong>Description:</strong> {{ product.description }}</p>
+            <hr>
+            <a href="{% url 'store:product_list' %}" class="btn btn-primary rounded-pill py-2 px-4">Back to Products</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
