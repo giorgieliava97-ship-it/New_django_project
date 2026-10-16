@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Electronics Store{% endblock %}
+{% block title %}Electro - Electronics Website Template{% endblock %}
 
 {% block content %}
 
@@ -11,7 +12,7 @@
                     <div class="header-carousel owl-carousel bg-light py-5">
                         <div class="row g-0 header-carousel-item align-items-center">
                             <div class="col-xl-6 carousel-img wow fadeInLeft" data-wow-delay="0.1s">
-
+                                <img src="{% static 'img/carousel-1.png' %}" class="img-fluid w-100" alt="Image">
                             </div>
                             <div class="col-xl-6 carousel-content p-4">
                                 <h4 class="text-uppercase fw-bold mb-4 wow fadeInRight" data-wow-delay="0.1s" style="letter-spacing: 3px;">Save Up To A $400</h4>
@@ -25,81 +26,9 @@
             </div>
         </div>
         <!-- Carousel End -->
+        {% include 'partials/services.html' %}
 
-        <!-- Services Start -->
-        <div class="container-fluid px-0">
-            <div class="row g-0">
-                <div class="col-6 col-md-4 col-lg-2 border-start border-end wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="p-4">
-                        <div class="d-inline-flex align-items-center">
-                            <i class="fa fa-sync-alt fa-2x text-primary"></i>
-                            <div class="ms-4">
-                                <h6 class="text-uppercase mb-2">Free Return</h6>
-                                <p class="mb-0">30 days money back!</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-4 col-lg-2 border-end wow fadeInUp" data-wow-delay="0.2s">
-                    <div class="p-4">
-                        <div class="d-flex align-items-center">
-                            <i class="fab fa-telegram-plane fa-2x text-primary"></i>
-                            <div class="ms-4">
-                                <h6 class="text-uppercase mb-2">Free Shipping</h6>
-                                <p class="mb-0">On all orders</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-4 col-lg-2 border-end wow fadeInUp" data-wow-delay="0.3s">
-                    <div class="p-4">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-life-ring fa-2x text-primary"></i>
-                            <div class="ms-4">
-                                <h6 class="text-uppercase mb-2">Support 24/7</h6>
-                                <p class="mb-0">Online support</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-4 col-lg-2 border-end wow fadeInUp" data-wow-delay="0.4s">
-                    <div class="p-4">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-credit-card fa-2x text-primary"></i>
-                            <div class="ms-4">
-                                <h6 class="text-uppercase mb-2">Secure Payment</h6>
-                                <p class="mb-0">100% Protected</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-4 col-lg-2 border-end wow fadeInUp" data-wow-delay="0.5s">
-                    <div class="p-4">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-lock fa-2x text-primary"></i>
-                            <div class="ms-4">
-                                <h6 class="text-uppercase mb-2">Safe Shopping</h6>
-                                <p class="mb-0">Trusted store</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-4 col-lg-2 border-end wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="p-4">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-blog fa-2x text-primary"></i>
-                            <div class="ms-4">
-                                <h6 class="text-uppercase mb-2">Member Gift</h6>
-                                <p class="mb-0">Special rewards</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Services End -->
-
-        <!-- Dynamic Products Section -->
+        <!-- Our Products Start -->
         <div class="container-fluid product py-5">
             <div class="container py-5">
                 <div class="row g-4 mb-4">
@@ -111,28 +40,39 @@
                     </div>
                 </div>
 
-<!--                ბაზიდან წამოღებული პროდუქტები-->
+                <!-- ბაზიდან წამოღებული პროდუქტები -->
                 <div class="row g-4">
                     {% for product in products %}
                     <div class="col-md-6 col-lg-4 col-xl-3">
                         <div class="product-item rounded wow fadeInUp" data-wow-delay="0.1s">
                             <div class="product-item-inner border rounded">
-<!--                                <div class="product-item-inner-item">-->
-<!--                                    {% if product.image %}-->
-<!--                                        <img src="{{ product.image.url }}" class="img-fluid w-100 rounded-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">-->
-<!--                                    {% endif %}-->
+                                <div class="product-item-inner-item position-relative">
+                                    {% if product.image %}
+                                        <img src="{{ product.image.url }}" class="img-fluid w-100 rounded-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                                    {% else %}
+                                        <img src="{% static 'img/product-3.png' %}" class="img-fluid w-100 rounded-top" alt="">
+                                    {% endif %}
+
+                                    {% if product.has_discount %}
+                                        <div class="product-sale bg-danger text-white px-2 py-1 position-absolute top-0 start-0 m-2 rounded" style="z-index: 2;">Sale</div>
+                                    {% endif %}
+
                                     <div class="product-details">
                                         <a href="{% url 'store:product_detail' product.pk %}"><i class="fa fa-eye fa-1x"></i></a>
                                     </div>
                                 </div>
                                 <div class="text-center rounded-bottom p-4">
                                     <a href="#" class="d-block mb-2 text-muted">{{ product.category.name }}</a>
-                                    <a href="{% url 'store:product_detail' product.pk %}" class="d-block h4">{{ product.name }}</a>
-                                    <span class="text-primary fs-5">${{ product.price }}</span>
+                                    <a href="{% url 'store:product_detail' product.pk %}" class="d-block h4 text-dark">{{ product.name }}</a>
+                                    <span class="text-primary fs-5 fw-bold">{{ product.price }} ₾</span>
                                 </div>
                             </div>
                             <div class="product-item-add border border-top-0 rounded-bottom text-center p-4 pt-0">
                                 <a href="{% url 'store:product_detail' product.pk %}" class="btn btn-primary border-secondary rounded-pill py-2 px-4 mb-2">View Details</a>
+                                <div class="d-flex justify-content-center gap-2 mt-2">
+                                    <a href="{% url 'store:product_update' product.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    <a href="{% url 'store:product_delete' product.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -144,6 +84,8 @@
                 </div>
             </div>
         </div>
-        <!-- Dynamic Products End -->
+        <!-- Our Products End -->
+
+
 
 {% endblock %}

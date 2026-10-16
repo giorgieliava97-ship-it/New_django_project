@@ -1,68 +1,108 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Products - Store{% endblock %}
+{% block title %}Shop - Electro Store{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Store</h1>
-        <a href="{% url 'store:discounted_products' %}" class="btn btn-outline-danger fw-bold">🔥 Discounted Products</a>
-    </div>
-    <hr class="mb-5">
 
-    <div class="row g-4">
-        <!-- Sidebar-->
-        <div class="col-lg-3">
-            <div class="border rounded p-4 bg-light">
-                <h3 class="mb-3">Categories</h3>
-                <ul class="list-unstyled">
-                    {% for category in categories %}
-                        <li class="mb-2">
-                            <a href="{% url 'store:category_products' category.pk %}" class="text-decoration-none">
-                                {{ category.name }} ({{ category.product_count }})
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
+        <!-- Single Page Header start -->
+        <div class="container-fluid page-header py-5">
+            <h1 class="text-center text-white display-6 wow fadeInUp" data-wow-delay="0.1s">Shop Page</h1>
+            <ol class="breadcrumb justify-content-center mb-0 wow fadeInUp" data-wow-delay="0.3s">
+                <li class="breadcrumb-item"><a href="{% url 'store:index' %}">Home</a></li>
+                <li class="breadcrumb-item active text-white">Shop</li>
+            </ol>
         </div>
+        <!-- Single Page Header End -->
 
-        <!-- Products -->
-        <div class="col-lg-9">
-            <h3 class="mb-4">All Products</h3>
-            <div class="row g-4">
-                {% for product in products %}
-                    <div class="col-md-6 col-xl-4">
-                        <div class="border rounded p-4 h-100 bg-white shadow-sm d-flex flex-column justify-content-between">
-                            <div>
-                                <h5>
-                                    <a href="{% url 'store:product_detail' product.pk %}" class="text-decoration-none">
-                                        {{ product.name }}
-                                    </a>
-                                </h5>
-                                <p class="text-primary fs-5 mb-2">{{ product.price }} ₾</p>
-                                {% if product.has_discount %}
-                                    <span class="badge bg-badge bg-danger mb-3">SALE</span>
-                                {% endif %}
-                            </div>
+        {% include 'partials/services.html' %}
 
-                            <!-- CRUD  -->
-                            <div class="mt-3">
-                                <a href="{% url 'store:product_detail' product.pk %}" class="btn btn-sm btn-outline-primary w-100 mb-2">View Details</a>
-                                <div class="d-flex gap-2">
-                                    <a href="{% url 'store:product_update' product.pk %}" class="btn btn-sm btn-outline-warning w-50">Edit</a>
-                                    <a href="{% url 'store:product_delete' product.pk %}" class="btn btn-sm btn-outline-danger w-50">Delete</a>
-                                </div>
-                            </div>
+        <!-- Shop Page Start -->
+        <div class="container-fluid shop py-5">
+            <div class="container py-5">
+                <div class="row g-4">
+                    <!-- მარცხენა მხარე (Sidebar - კატეგორიები და ფასდაკლების ღილაკი) -->
+                    <div class="col-lg-3 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="product-categories mb-4">
+                            <h4>Products Categories</h4>
+                            <ul class="list-unstyled">
+                                {% for category in categories %}
+                                <li>
+                                    <div class="categories-item d-flex justify-content-between py-2 border-bottom">
+                                        <a href="{% url 'store:category_products' category.pk %}" class="text-dark">
+                                            <i class="fas fa-angle-right text-secondary me-2"></i> {{ category.name }}
+                                        </a>
+                                        <span>({{ category.product_count }})</span>
+                                    </div>
+                                </li>
+                                {% empty %}
+                                <li class="text-muted">No categories available</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <!-- ფასდაკლებული პროდუქტების სწრაფი ლინკი -->
+                        <div class="mb-4">
+                            <a href="{% url 'store:discounted_products' %}" class="btn btn-outline-danger w-100 fw-bold py-3 rounded-pill">🔥 Discounted Products</a>
                         </div>
                     </div>
-                {% empty %}
-                    <div class="col-12">
-                        <p class="text-muted">No products available.</p>
+
+                    <!-- მარჯვენა მხარე (პროდუქტების სია) -->
+                    <div class="col-lg-9 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="row g-4 mb-4 align-items-center">
+                            <div class="col-xl-6">
+                                <h2>All Products</h2>
+                            </div>
+                        </div>
+
+                        <!-- პროდუქტების ბადე -->
+                        <div class="row g-4 product">
+                            {% for product in products %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="product-item rounded wow fadeInUp" data-wow-delay="0.1s">
+                                    <div class="product-item-inner border rounded">
+                                        <div class="product-item-inner-item position-relative">
+                                            {% if product.image %}
+                                                <img src="{{ product.image.url }}" class="img-fluid w-100 rounded-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                                            {% else %}
+                                                <img src="{% static 'img/product-3.png' %}" class="img-fluid w-100 rounded-top" alt="">
+                                            {% endif %}
+
+                                            {% if product.has_discount %}
+                                                <div class="product-sale bg-danger text-white px-2 py-1 position-absolute top-0 start-0 m-2 rounded" style="z-index: 2;">Sale</div>
+                                            {% endif %}
+
+                                            <div class="product-details">
+                                                <a href="{% url 'store:product_detail' product.pk %}"><i class="fa fa-eye fa-1x"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="text-center rounded-bottom p-4">
+                                            <a href="#" class="d-block mb-2 text-muted">{{ product.category.name }}</a>
+                                            <a href="{% url 'store:product_detail' product.pk %}" class="d-block h4 text-dark">{{ product.name }}</a>
+                                            <span class="text-primary fs-5 fw-bold">{{ product.price }} ₾</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- CRUD და დეტალების ღილაკები -->
+                                    <div class="product-item-add border border-top-0 rounded-bottom text-center p-4 pt-0">
+                                        <a href="{% url 'store:product_detail' product.pk %}" class="btn btn-primary border-secondary rounded-pill py-2 px-4 mb-3 w-100"><i class="fas fa-shopping-cart me-2"></i> View Details</a>
+                                        <div class="d-flex justify-content-between gap-2">
+                                            <a href="{% url 'store:product_update' product.pk %}" class="btn btn-sm btn-outline-warning w-50 rounded-pill">Edit</a>
+                                            <a href="{% url 'store:product_delete' product.pk %}" class="btn btn-sm btn-outline-danger w-50 rounded-pill">Delete</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12 text-center py-5">
+                                <h3 class="text-muted">No products available.</h3>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                {% endfor %}
+                </div>
             </div>
         </div>
-    </div>
-</div>
+        <!-- Shop Page End -->
+
 {% endblock %}
