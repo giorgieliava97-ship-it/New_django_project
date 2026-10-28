@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.conf import settings
 
 class Category(models.Model):
     name = models.CharField(max_length=200, unique=True)
@@ -18,6 +18,11 @@ class Product(models.Model):
     is_available = models.BooleanField(default=True)
     has_discount = models.BooleanField(default=False)  # ფასდაკლების ველი
     description = models.TextField(blank=True, null=True)
+
+    image = models.ImageField(upload_to='products/', blank=True, null=True)
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name='products')
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

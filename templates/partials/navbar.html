@@ -33,16 +33,33 @@
                                 <a href="#" class="dropdown-item"> Italiano</a>
                             </div>
                         </div>
+                        <!-- Topbar User Dashboard Dropdown -->
                         <div class="dropdown">
-                            <a href="#" class="dropdown-toggle text-muted ms-2" data-bs-toggle="dropdown"><small><i class="fa fa-home me-2"></i> My Dashboard</small></a>
+                            <a href="#" class="dropdown-toggle text-muted ms-2" data-bs-toggle="dropdown">
+                                <small>
+                                    <i class="fa fa-user me-2"></i>
+                                    {% if request.user.is_authenticated %}{{ request.user.username }}{% else %}My Dashboard{% endif %}
+                                </small>
+                            </a>
                             <div class="dropdown-menu rounded">
-                                <a href="#" class="dropdown-item"> Login</a>
-                                <a href="#" class="dropdown-item"> Wishlist</a>
-                                <a href="#" class="dropdown-item"> My Card</a>
-                                <a href="#" class="dropdown-item"> Notifications</a>
-                                <a href="#" class="dropdown-item"> Account Settings</a>
-                                <a href="#" class="dropdown-item"> My Account</a>
-                                <a href="#" class="dropdown-item"> Log Out</a>
+                                {% if request.user.is_authenticated %}
+                                    <a href="#" class="dropdown-item">My Account</a>
+                                    <a href="#" class="dropdown-item">Wishlist</a>
+                                    <a href="#" class="dropdown-item">My Card</a>
+                                    <a href="#" class="dropdown-item">Notifications</a>
+                                    <a href="#" class="dropdown-item">Account Settings</a>
+                                    <div class="dropdown-divider"></div>
+                                    <!-- Logout Form for Topbar -->
+                                    <form action="{% url 'user:logout' %}" method="post" class="px-3 py-1">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger w-100">Log Out</button>
+                                    </form>
+                                {% else %}
+                                    <a href="{% url 'user:login' %}" class="dropdown-item">Login</a>
+                                    <a href="{% url 'user:register' %}" class="dropdown-item">Register</a>
+                                    <a href="#" class="dropdown-item">Wishlist</a>
+                                    <a href="#" class="dropdown-item">My Card</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -55,7 +72,6 @@
                     <div class="d-inline-flex align-items-center">
                         <a href="" class="navbar-brand p-0">
                             <h1 class="display-5 text-primary m-0"><i class="fas fa-shopping-bag text-secondary me-2"></i>Electro</h1>
-                            <!-- <img src="img/logo.png" alt="Logo"> -->
                         </a>
                     </div>
                 </div>
@@ -76,8 +92,8 @@
                 </div>
                 <div class="col-md-4 col-lg-3 text-center text-lg-end">
                     <div class="d-inline-flex align-items-center">
-                        <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-random"></i></i></a>
-                        <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></a>
+                        <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-random"></i></span></a>
+                        <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></span></a>
                         <a href="#" class="text-muted d-flex align-items-center justify-content-center"><span class="rounded-circle btn-md-square border"><i class="fas fa-shopping-cart"></i></span> <span class="text-dark ms-2">$0.00</span></a>
                     </div>
                 </div>
@@ -125,7 +141,7 @@
                     <span class="fa fa-bars fa-1x text-white"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <div class="navbar-nav ms-auto py-0">
+                    <div class="navbar-nav ms-auto py-0 align-items-lg-center">
                         <a href="{% url 'store:index' %}" class="nav-item nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">Home</a>
                         <a href="{% url 'store:product_list' %}" class="nav-item nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}">Shop</a>
 
@@ -139,9 +155,21 @@
                             </div>
                         </div>
 
-                        <a href="#" class="nav-item nav-link me-2">Contact</a>
+                        <a href="#" class="nav-link">Contact</a>
 
-                        <div class="nav-item dropdown d-block d-lg-none mb-3">
+                        <!-- Dynamic Auth Links in Main Navbar -->
+                        {% if request.user.is_authenticated %}
+                            <span class="nav-link text-white d-none d-lg-inline-block">Hello, <b>{{ request.user.username }}</b></span>
+                            <form action="{% url 'user:logout' %}" method="post" class="d-inline my-auto ms-2">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-light btn-sm py-1 px-3">Logout</button>
+                            </form>
+                        {% else %}
+                            <a href="{% url 'user:login' %}" class="nav-item nav-link">Login</a>
+                            <a href="{% url 'user:register' %}" class="btn btn-light text-primary rounded-pill py-2 px-4 ms-lg-2">Register</a>
+                        {% endif %}
+
+                        <div class="nav-item dropdown d-block d-lg-none mb-3 mt-2">
                             <a href="#" class="nav-link dropdown-toggle text-white" data-bs-toggle="dropdown">All Category</a>
                             <div class="dropdown-menu m-0">
                                 <ul class="list-unstyled categories-bars">
@@ -157,7 +185,7 @@
                             </div>
                         </div>
                     </div>
-                    <a href="" class="btn btn-secondary rounded-pill py-2 px-4 px-lg-3 mb-3 mb-md-3 mb-lg-0"><i class="fa fa-mobile-alt me-2"></i> +0123 456 7890</a>
+                    <a href="" class="btn btn-secondary rounded-pill py-2 px-4 px-lg-3 mb-3 mb-md-3 mb-lg-0 ms-lg-3"><i class="fa fa-mobile-alt me-2"></i> +0123 456 7890</a>
                 </div>
             </nav>
         </div>

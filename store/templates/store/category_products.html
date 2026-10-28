@@ -12,6 +12,16 @@
         {% for product in products %}
             <div class="col-md-6 col-lg-4">
                 <div class="border rounded p-4 shadow-sm bg-white">
+
+
+                    <div class="text-center mb-3">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded" style="height: 180px; object-fit: cover;">
+                        {% else %}
+                            <img src="/media/products/default.jpg" alt="Default Image" class="img-fluid rounded" style="height: 180px; object-fit: cover;">
+                        {% endif %}
+                    </div>
+
                     <h3>
                         <a href="{% url 'store:product_detail' product.pk %}" class="text-decoration-none">
                             {{ product.name }}

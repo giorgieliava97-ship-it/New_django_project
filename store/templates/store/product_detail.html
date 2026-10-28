@@ -6,17 +6,46 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8 bg-white border rounded p-5 shadow-sm">
+
+            <!-- სურათის გამოტანა -->
+            <div class="text-center mb-4">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded shadow" style="max-height: 350px; object-fit: cover;">
+                {% else %}
+                    <img src="/media/products/default.jpg" alt="Default Image" class="img-fluid rounded shadow" style="max-height: 350px; object-fit: cover;">
+                {% endif %}
+            </div>
+
             <h1 class="mb-4">{{ product.name }}</h1>
+
             <p class="fs-4"><strong>Price:</strong> {{ product.price }} ₾
                 {% if product.has_discount %}
                     <span class="badge bg-danger">SALE</span>
                 {% endif %}
             </p>
+
             <p><strong>Quantity:</strong> {{ product.quantity }}</p>
             <p><strong>Category:</strong> {{ product.category.name }}</p>
+
+            <!-- ავტორის გამოტანა -->
+            {% if product.user %}
+                <p><strong>Added by:</strong> <span class="text-primary">{{ product.user.username }}</span></p>
+            {% endif %}
+
             <p class="text-muted"><strong>Description:</strong> {{ product.description }}</p>
             <hr>
-            <a href="{% url 'store:product_list' %}" class="btn btn-primary rounded-pill py-2 px-4">Back to Products</a>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{% url 'store:product_list' %}" class="btn btn-primary rounded-pill py-2 px-4">Back to Products</a>
+
+                {% if request.user == product.user or request.user.is_superuser %}
+                    <div>
+                        <a href="{% url 'store:product_update' product.pk %}" class="btn btn-warning rounded-pill py-2 px-3 me-2">Edit</a>
+                        <a href="{% url 'store:product_delete' product.pk %}" class="btn btn-danger rounded-pill py-2 px-3">Delete</a>
+                    </div>
+                {% endif %}
+            </div>
+
         </div>
     </div>
 </div>
