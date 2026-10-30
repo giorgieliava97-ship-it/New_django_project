@@ -22,6 +22,8 @@ class ProductListView(ListView):
     context_object_name = 'products'
     queryset = Product.objects.filter(is_available=True)
     ordering = ['price']
+    paginate_by = 6
+
 
 
 class CategoryProductsView(ListView):
