@@ -52,7 +52,7 @@ MIDDLEWARE = [
     'store.middlewares.MaintenanceModeMiddleware',
 ]
 
-MAINTENANCE_MODE = True
+MAINTENANCE_MODE = False
 
 ROOT_URLCONF = 'store_project.urls'
 

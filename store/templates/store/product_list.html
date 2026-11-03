@@ -20,92 +20,133 @@
         <!-- Shop Page Start -->
         <div class="container-fluid shop py-5">
             <div class="container py-5">
-                <div class="row g-4">
-                    <!-- მარცხენა მხარე (Sidebar - კატეგორიები და ფასდაკლების ღილაკი) -->
-                    <div class="col-lg-3 wow fadeInUp" data-wow-delay="0.1s">
-                        <div class="product-categories mb-4">
-                            <h4>Products Categories</h4>
-                            <ul class="list-unstyled">
-                                {% for category in categories %}
-                                <li>
-                                    <div class="categories-item d-flex justify-content-between py-2 border-bottom">
-                                        <a href="{% url 'store:category_products' category.pk %}" class="text-dark">
-                                            <i class="fas fa-angle-right text-secondary me-2"></i> {{ category.name }}
-                                        </a>
-                                        <span>({{ category.product_count }})</span>
-                                    </div>
-                                </li>
-                                {% empty %}
-                                <li class="text-muted">No categories available</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
+                <!-- Filter and sort form -->
+                <form method="GET" action="{% url 'store:product_list' %}" id="filterForm">
+                    <!-- Preserve search query if exists -->
+                    {% if request.GET.q %}
+                        <input type="hidden" name="q" value="{{ request.GET.q }}">
+                    {% endif %}
 
-                        <!-- ფასდაკლებული პროდუქტების სწრაფი ლინკი -->
-                        <div class="mb-4">
-                            <a href="{% url 'store:discounted_products' %}" class="btn btn-outline-danger w-100 fw-bold py-3 rounded-pill">🔥 Discounted Products</a>
-                        </div>
-                    </div>
+                    <div class="row g-4">
+                        <!-- Left side: Category dropdown and dual-handle price filter -->
+                        <div class="col-lg-3 wow fadeInUp" data-wow-delay="0.1s">
 
-                    <!-- მარჯვენა მხარე (პროდუქტების სია) -->
-                    <div class="col-lg-9 wow fadeInUp" data-wow-delay="0.1s">
-                        <div class="row g-4 mb-4 align-items-center">
-                            <div class="col-xl-6">
-                                <h2>All Products</h2>
+                            <!-- Category Dropdown Filter -->
+                            <div class="product-categories mb-4 border rounded p-4 bg-white shadow-sm">
+                                <h4 class="mb-3">Select Category</h4>
+                                <select name="category" class="form-select text-dark" onchange="document.getElementById('filterForm').submit()">
+                                    <option value="">All Categories</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ category.name }} ({{ category.product_count }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
                             </div>
+
+                            <!-- Dual Price Filter Slider (Min & Max) -->
+                            <div class="price-filter mb-4 border rounded p-4 bg-white shadow-sm">
+                                <h4 class="mb-3">Price Filter</h4>
+                                <div class="mb-3">
+                                    <label class="form-label">Min Price: <span id="minPriceValue">{{ request.GET.min_price|default:min_product_price }}</span> ₾</label>
+                                    <input type="range" class="form-range"
+                                           min="{{ min_product_price|default:0 }}"
+                                           max="{{ max_product_price|default:5000 }}"
+                                           name="min_price" id="minPriceRange"
+                                           value="{{ request.GET.min_price|default:min_product_price }}"
+                                           oninput="document.getElementById('minPriceValue').innerText = this.value"
+                                           onchange="document.getElementById('filterForm').submit()">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Max Price: <span id="maxPriceValue">{{ request.GET.max_price|default:max_product_price }}</span> ₾</label>
+                                    <input type="range" class="form-range"
+                                           min="{{ min_product_price|default:0 }}"
+                                           max="{{ max_product_price|default:5000 }}"
+                                           name="max_price" id="maxPriceRange"
+                                           value="{{ request.GET.max_price|default:max_product_price }}"
+                                           oninput="document.getElementById('maxPriceValue').innerText = this.value"
+                                           onchange="document.getElementById('filterForm').submit()">
+                                </div>
+                            </div>
+
+                            <!-- Discounted products button -->
+                            <div class="mb-4">
+                                <a href="{% url 'store:discounted_products' %}" class="btn btn-outline-danger w-100 fw-bold py-3 rounded-pill">🔥 Discounted Products</a>
+                            </div>
+
                         </div>
 
-                        <!-- პროდუქტების ბადე -->
-                        <div class="row g-4 product">
-                            {% for product in products %}
-                            <div class="col-md-6 col-lg-4">
-                                <div class="product-item rounded wow fadeInUp" data-wow-delay="0.1s">
-                                    <div class="product-item-inner border rounded">
-                                        <div class="product-item-inner-item position-relative">
-                                            {% if product.image %}
-                                                <img src="{{ product.image.url }}" class="img-fluid w-100 rounded-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
-                                            {% else %}
-                                                <img src="{% static 'img/product-3.png' %}" class="img-fluid w-100 rounded-top" alt="">
-                                            {% endif %}
+                        <!-- Right side: sorting and product list -->
+                        <div class="col-lg-9 wow fadeInUp" data-wow-delay="0.1s">
 
-                                            {% if product.has_discount %}
-                                                <div class="product-sale bg-danger text-white px-2 py-1 position-absolute top-0 start-0 m-2 rounded" style="z-index: 2;">Sale</div>
-                                            {% endif %}
+                            <!-- Dynamic category name title and sorting dropdown -->
+                            <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 border rounded shadow-sm">
+                                <h2 class="m-0">{{ selected_category_name }}</h2>
 
-                                            <div class="product-details">
-                                                <a href="{% url 'store:product_detail' product.pk %}"><i class="fa fa-eye fa-1x"></i></a>
+                                <div class="d-flex align-items-center">
+                                    <label for="sortSelect" class="me-2 fw-bold text-muted text-nowrap">Sort By:</label>
+                                    <select name="sort" id="sortSelect" class="form-select text-dark" onchange="document.getElementById('filterForm').submit()">
+                                        <option value="" {% if not request.GET.sort %}selected{% endif %}>Default</option>
+                                        <option value="price_low" {% if not request.GET.sort == 'price_low' and request.GET.sort == 'price_low' or request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                                        <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                                        <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Products grid -->
+                            <div class="row g-4 product">
+                                {% for product in products %}
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="product-item rounded wow fadeInUp" data-wow-delay="0.1s">
+                                        <div class="product-item-inner border rounded bg-white">
+                                            <div class="product-item-inner-item position-relative">
+                                                {% if product.image %}
+                                                    <img src="{{ product.image.url }}" class="img-fluid w-100 rounded-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                                                {% else %}
+                                                    <img src="{% static 'img/product-3.png' %}" class="img-fluid w-100 rounded-top" alt="">
+                                                {% endif %}
+
+                                                {% if product.has_discount %}
+                                                    <div class="product-sale bg-danger text-white px-2 py-1 position-absolute top-0 start-0 m-2 rounded" style="z-index: 2;">Sale</div>
+                                                {% endif %}
+
+                                                <div class="product-details">
+                                                    <a href="{% url 'store:product_detail' product.pk %}"><i class="fa fa-eye fa-1x"></i></a>
+                                                </div>
+                                            </div>
+                                            <div class="text-center rounded-bottom p-4">
+                                                <a href="#" class="d-block mb-2 text-muted">{{ product.category.name }}</a>
+                                                <a href="{% url 'store:product_detail' product.pk %}" class="d-block h4 text-dark">{{ product.name }}</a>
+                                                <span class="text-primary fs-5 fw-bold">{{ product.price }} ₾</span>
                                             </div>
                                         </div>
-                                        <div class="text-center rounded-bottom p-4">
-                                            <a href="#" class="d-block mb-2 text-muted">{{ product.category.name }}</a>
-                                            <a href="{% url 'store:product_detail' product.pk %}" class="d-block h4 text-dark">{{ product.name }}</a>
-                                            <span class="text-primary fs-5 fw-bold">{{ product.price }} ₾</span>
-                                        </div>
-                                    </div>
 
-                                    <!-- CRUD და დეტალების ღილაკები -->
-                                    <div class="product-item-add border border-top-0 rounded-bottom text-center p-4 pt-0">
-                                        <a href="{% url 'store:product_detail' product.pk %}" class="btn btn-primary border-secondary rounded-pill py-2 px-4 mb-3 w-100"><i class="fas fa-shopping-cart me-2"></i> View Details</a>
-                                        <div class="d-flex justify-content-between gap-2">
-                                            <a href="{% url 'store:product_update' product.pk %}" class="btn btn-sm btn-outline-warning w-50 rounded-pill">Edit</a>
-                                            <a href="{% url 'store:product_delete' product.pk %}" class="btn btn-sm btn-outline-danger w-50 rounded-pill">Delete</a>
+                                        <!-- CRUD actions -->
+                                        <div class="product-item-add border border-top-0 rounded-bottom text-center p-4 pt-0 bg-white">
+                                            <a href="{% url 'store:product_detail' product.pk %}" class="btn btn-primary border-secondary rounded-pill py-2 px-4 mb-3 w-100"><i class="fas fa-shopping-cart me-2"></i> View Details</a>
+                                            <div class="d-flex justify-content-between gap-2">
+                                                <a href="{% url 'store:product_update' product.pk %}" class="btn btn-sm btn-outline-warning w-50 rounded-pill">Edit</a>
+                                                <a href="{% url 'store:product_delete' product.pk %}" class="btn btn-sm btn-outline-danger w-50 rounded-pill">Delete</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                {% empty %}
+                                <div class="col-12 text-center py-5">
+                                    <h3 class="text-muted">No products available.</h3>
+                                </div>
+                                {% endfor %}
                             </div>
-                            {% empty %}
-                            <div class="col-12 text-center py-5">
-                                <h3 class="text-muted">No products available.</h3>
-                            </div>
-                            {% endfor %}
+
+                            <!-- Shop Pagination -->
+                            {% include 'partials/shop_paginator.html' %}
                         </div>
+
                     </div>
-                </div>
+                </form>
             </div>
         </div>
         <!-- Shop Page End -->
-        <!-- Shop Pagination -->
-        {% include 'partials/shop_paginator.html' %}
-
 
 {% endblock %}
